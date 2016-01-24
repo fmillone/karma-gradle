@@ -15,8 +15,9 @@
  */
 package com.craigburke.gradle
 
-import groovy.json.JsonBuilder
-import static KarmaConstants.*
+import org.json.JSONObject
+
+import static com.craigburke.gradle.KarmaConstants.*
 
 class KarmaModuleExtension {
 
@@ -56,6 +57,10 @@ class KarmaModuleExtension {
         additionalDependencies += dependencies
     }
 
+    JSONFunction jsFunction(String function){
+        return new JSONFunction(jsCode: function)
+    }
+
     def propertyMissing(String name, value) {
         configProperties[name] = value
     }
@@ -84,7 +89,7 @@ class KarmaModuleExtension {
     }
 
     String getConfigJson() {
-        List<String> karmaFiles = files ?: profile.files
+        List<String> karmaFiles = files ?: profile.files*.toString()
 
         Map properties = [
                 basePath     : basePath,
@@ -100,9 +105,8 @@ class KarmaModuleExtension {
 
         configProperties.each { properties[it.key] = it.value }
 
-        def json = new JsonBuilder()
-        json(properties)
-        json.toPrettyString()
+        JSONObject jsonObject = new JSONObject(properties)
+        jsonObject.toString(4)
     }
 
     String getConfigJavaScript() {

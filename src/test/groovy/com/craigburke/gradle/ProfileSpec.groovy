@@ -1,5 +1,6 @@
 package com.craigburke.gradle
 
+import net.sf.json.JSONArray
 import spock.lang.Unroll
 import static TestConstants.*
 import static ProfileFileType.*
@@ -14,7 +15,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == getProfile('default').files
+        configMap.files == getProfile('default').files*.toString() as JSONArray
     }
 
     def "default profile is not applied when files are specified"() {
@@ -24,7 +25,7 @@ class ProfileSpec extends KarmaBaseSpec {
         }
 
         then:
-        configMap.files == ['foo.js']
+        configMap.files == ['foo.js']  as JSONArray
     }
 
     @Unroll('can apply the #profileName profile')
@@ -38,7 +39,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == getProfile(profileName).files
+        configMap.files == getProfile(profileName).files*.toString()  as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -58,7 +59,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == ["lib.js"] + currentProfile.getFileListByType(SOURCE) + currentProfile.getFileListByType(TESTS)
+        configMap.files ==( ["lib.js"] + currentProfile.getFileListByType(SOURCE) + currentProfile.getFileListByType(TESTS)  )*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -81,7 +82,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == currentProfile.getFileListByType(LIBRARIES) + ['source.js'] + currentProfile.getFileListByType(TESTS)
+        configMap.files == ( currentProfile.getFileListByType(LIBRARIES) + ['source.js'] + currentProfile.getFileListByType(TESTS))*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -102,7 +103,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == currentProfile.getFileListByType(LIBRARIES) + currentProfile.getFileListByType(SOURCE) + ['test.js']
+        configMap.files == ( currentProfile.getFileListByType(LIBRARIES) + currentProfile.getFileListByType(SOURCE) + ['test.js'] )*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -127,7 +128,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == ['/libs/lib.js', '/source/source.js', '/test/test.js']
+        configMap.files == ['/libs/lib.js', '/source/source.js', '/test/test.js'] as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -156,7 +157,7 @@ class ProfileSpec extends KarmaBaseSpec {
                 '/vendor/lib1.js',
                 '/libs/foo/bar/lib2.js',
                 '/vendor/foo/bar/lib2.js'
-        ]
+        ] as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -181,7 +182,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == ['/src/source1.js', '/src/source2.js', '/src/foo/bar/source3.js']
+        configMap.files == ['/src/source1.js', '/src/source2.js', '/src/foo/bar/source3.js'] as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -205,7 +206,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap.files == ['/tests/test1.js', '/tests/test2.js', '/tests/foo/bar/test3.js']
+        configMap.files == ['/tests/test1.js', '/tests/test2.js', '/tests/foo/bar/test3.js'] as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -226,7 +227,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(true, 'assets')
 
         then:
-        configMap.files == Profile.getFileList(bases, currentProfile.libraryFilesDefault)
+        configMap.files == Profile.getFileList(bases, currentProfile.libraryFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -247,7 +248,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(false)
 
         then:
-        configMap.files == Profile.getFileList(currentProfile.libraryBaseDefault, currentProfile.libraryFilesDefault)
+        configMap.files == Profile.getFileList(currentProfile.libraryBaseDefault, currentProfile.libraryFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -268,7 +269,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(true, 'assets')
 
         then:
-        configMap.files == Profile.getFileList(['assets/'], currentProfile.sourceFilesDefault)
+        configMap.files == Profile.getFileList(['assets/'], currentProfile.sourceFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -288,7 +289,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(false)
 
         then:
-        configMap.files == Profile.getFileList(currentProfile.sourceBasesDefault, currentProfile.sourceFilesDefault)
+        configMap.files == Profile.getFileList(currentProfile.sourceBasesDefault, currentProfile.sourceFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -309,7 +310,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(true, 'assets')
 
         then:
-        configMap.files == Profile.getFileList(testBases, currentProfile.testFilesDefault)
+        configMap.files == Profile.getFileList(testBases, currentProfile.testFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST
@@ -330,7 +331,7 @@ class ProfileSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig(false)
 
         then:
-        configMap.files == Profile.getFileList(currentProfile.testBasesDefault, currentProfile.testFilesDefault)
+        configMap.files == Profile.getFileList(currentProfile.testBasesDefault, currentProfile.testFilesDefault)*.toString() as JSONArray
 
         where:
         profileName << PROFILE_LIST

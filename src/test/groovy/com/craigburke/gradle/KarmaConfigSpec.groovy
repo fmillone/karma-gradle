@@ -1,7 +1,10 @@
 package com.craigburke.gradle
 
+import net.sf.json.JSONArray
+import net.sf.json.JSONObject
 import spock.lang.Unroll
-import static TestConstants.*
+
+import static com.craigburke.gradle.TestConstants.*
 
 class KarmaConfigSpec extends KarmaBaseSpec {
 
@@ -11,7 +14,7 @@ class KarmaConfigSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         expect:
-        configMap['reporters'] == [reporter]
+        configMap['reporters'] == [reporter] as JSONArray
 
         where:
         reporter << REPORTER_LIST
@@ -23,7 +26,7 @@ class KarmaConfigSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         expect:
-        configMap['browsers'] == [browser]
+        configMap['browsers'] == [browser] as JSONArray
 
         where:
         browser << BROWSER_LIST
@@ -35,14 +38,14 @@ class KarmaConfigSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         expect:
-        configMap['frameworks'] == [framework]
+        configMap['frameworks'] == [framework]  as JSONArray
 
         where:
         framework << FRAMEWORK_LIST
     }
 
     @Unroll('Add addition property #property')
-    def "additional properties added to DSL"() {
+    def "additional object properties added to DSL"() {
         when:
         karma {
             this[property] = value
@@ -52,14 +55,65 @@ class KarmaConfigSpec extends KarmaBaseSpec {
         karmaConfig.finalizeConfig()
 
         then:
-        configMap[property] == value
+        configMap[property] == value as JSONObject
 
         where:
         property      | value
-        'stringProp'  | 'bar'
-        'booleanProp' | true
         'mapProp'     | ['foo': ['bar': 999]]
-        'arrayProp'   | ['foo', 'bar', 'foobar']
+        'emptyMapProp'     | [:]
     }
+
+    @Unroll('Add addition property #property')
+    def "additional list properties added to DSL"() {
+        when:
+            karma {
+                this[property] = value
+            }
+
+        and:
+            karmaConfig.finalizeConfig()
+
+        then:
+            configMap[property] == value as JSONArray
+
+        where:
+            property      | value
+            'arrayProp'   | ['foo', 'bar', 'foobar']
+            'emptyArrayProp'   | []
+    }
+
+
+    @Unroll('Add addition property #property')
+    def "additional simple value property added to DSL"() {
+        when:
+            karma {
+                this[property] = value
+            }
+
+        and:
+            karmaConfig.finalizeConfig()
+
+        then:
+            configMap[property] == value
+
+        where:
+            property      | value
+            'stringProp'  | 'bar'
+            'booleanProp' | true
+
+    }
+
+    def "should add a string as value"(){
+        when:
+            karma {
+                this['stringProp'] = new JSONFunction(jsCode:"function () {return 'hello world'; }")
+            }
+        and:
+            karmaConfig.finalizeConfig()
+
+        then:
+            configMap['stringProp'] == "function(){ return 'hello world'; }"
+    }
+
 
 }

@@ -23,6 +23,8 @@ ext {
 dependencies {
     compile gradleApi()
     compile 'org.codehaus.groovy:groovy-all:2.3.10'
+    compile 'org.json:json:20151123'
+    compile(group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15')
     compile 'com.moowork.gradle:gradle-node-plugin:0.11'
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 }

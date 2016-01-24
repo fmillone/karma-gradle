@@ -1,6 +1,6 @@
 package com.craigburke.gradle
 
-import groovy.json.JsonSlurper
+import net.sf.json.JSONObject
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -18,7 +18,7 @@ class KarmaBaseSpec extends Specification {
     }
 
     protected getConfigMap() {
-        new JsonSlurper().parseText(karmaConfig.configJson)
+       JSONObject.fromObject( karmaConfig.configJson );
     }
 
     protected Profile getProfile(String name) {
